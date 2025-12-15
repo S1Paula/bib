@@ -47,50 +47,59 @@ def usun_autor_po_id(id:int)->None:
         cursor.execute("DELETE FROM autorzy WHERE id = ?", (id,))
         conn.commit()
 
-def zmodyfikuj_wszystkie_dane_po_id(id:int)->None:
-    if czy_autor_istnieje(id):
-        pass
-    else:
+def zmodyfikuj_dane_po_id(id: int) -> None:
+    if not czy_autor_istnieje(id):
         print("Nie ma takiego autora")
-        return None
+        return
+
     with get_con() as conn:
         cursor = conn.cursor()
-        print("Podaj dane")
-        imie = input("nowe imie: ")
-        nazwisko = input("nowe nazwisko: ")
-        rok_urodzenia = int(input("nowy rok urodzenia: "))
-        kraj_pochodzenia = input("nowy kraj pochodzenia: ")
 
+        wyb = input("imie(a), nazwisko(b), rok urodzenia(c), kraj pochodzenia(d): ")
 
-        cursor.execute("""UPDATE autorzy
-                        SET
-                            imie = ?,
-                            nazwisko = ?,
-                            rok_urodzenia = ?,
-                            kraj_pochodzenia = ?
-                        WHERE id = ?
-                        """,
-                        (imie,nazwisko,rok_urodzenia,kraj_pochodzenia,id))
+        if wyb == "a":
+            imie = input("nowe imie: ")
+            zmiana = f"imie = '{imie}'"
+
+        elif wyb == "b":
+            nazwisko = input("nowe nazwisko: ")
+            zmiana = f"nazwisko = '{nazwisko}'"
+
+        elif wyb == "c":
+            rok_urodzenia = int(input("nowy rok urodzenia: "))
+            zmiana = f"rok_urodzenia = {rok_urodzenia}"
+
+        elif wyb == "d":
+            kraj_pochodzenia = input("nowy kraj pochodzenia: ")
+            zmiana = f"kraj_pochodzenia = '{kraj_pochodzenia}'"
+
+        else:
+            print("Niepoprawny wybór")
+            return
+
+        sql = f"UPDATE autorzy SET {zmiana} WHERE id = {id}"
+        cursor.execute(sql)
+        conn.commit()
 
 
 utworz_tabele()
 
 def menu():
     while True:
-        akcja = input("dodaj(d), ususn(u), zmodyfikuj(m)")
-        if akcja == "d":
+        print("dodaj(a), usun(b), zmodyfikuj(c), wyjdz(d)")
+        akcja = input("odp: ")
+        if akcja == "a":
             imie = input("imie: ")
             nazwisko = input("nazwisko: ")
             rok_urodzenia = int(input("rok urodzenia: "))
             kraj_pochodzenia = input("kraj pochodzenia: ")
             dodaj_autora(imie, nazwisko, rok_urodzenia, kraj_pochodzenia)
-        elif akcja == "u":
+        elif akcja == "b":
             id = int(input("podaj id:"))
             usun_autor_po_id(id)
-        elif akcja == "m":
+        elif akcja == "c":
             id = int(input("podaj id:"))
-            zmodyfikuj_wszystkie_dane_po_id(id)
-        else:
+            zmodyfikuj_dane_po_id(id)
+        elif akcja == "d":
             break
 
-menu()
